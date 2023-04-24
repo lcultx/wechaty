@@ -35,6 +35,7 @@ import {
 import type {
   SayableSayer,
   Sayable,
+  SayOptions,
 }                             from '../sayable/mod.js'
 import {
   messageToSayable,
@@ -545,16 +546,17 @@ class MessageMixin extends MixinBase implements SayableSayer {
    */
   async say (
     sayable: Sayable,
+    options?: SayOptions,
   ): Promise<void | MessageInterface> {
-    log.verbose('Message', 'say(%s)', sayable)
+    log.verbose('Message', 'say(%s, %s)', sayable, JSON.stringify(options))
 
     const talker  = this.talker()
     const room    = this.room()
 
     if (room) {
-      return room.say(sayable)
+      return room.say(sayable, options)
     } else {
-      return talker.say(sayable)
+      return talker.say(sayable, options)
     }
   }
 
@@ -766,6 +768,28 @@ class MessageMixin extends MixinBase implements SayableSayer {
     }, text)
 
     return textWithoutMention.trim()
+  }
+
+  /**
+ * get the quoted message of the current message if exists
+ *
+ * @returns {Promise<MessageImplInterface | undefined>}
+ *
+ */
+
+  quote (): MessageInterface | undefined {
+    if (!this.payload) {
+      throw new Error('no payload')
+    }
+
+    const quoteMessageId = this.payload.quoteId
+    if (!quoteMessageId) {
+      return undefined // no quote is acceptable
+    }
+
+    const quoteMessage = (this.wechaty.Message as typeof MessageImpl).load(quoteMessageId)
+
+    return quoteMessage
   }
 
   /**

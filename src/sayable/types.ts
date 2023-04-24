@@ -52,11 +52,20 @@ interface SayableSayer {
   wechaty : WechatyInterface,
   say (
     sayable  : Sayable,
-    replyTo? : ContactInterface | ContactInterface[]
+    options? : SayOptions,
   ): Promise<void | MessageInterface>
 }
+
+interface SayOptionsObject {
+  replyTo?: ContactInterface | ContactInterface[],
+  quoteMessage?: MessageInterface,
+}
+
+type SayOptions = ContactInterface | ContactInterface[] | SayOptionsObject
 
 export type {
   SayableSayer,
   Sayable,
+  SayOptions,
+  SayOptionsObject,
 }
